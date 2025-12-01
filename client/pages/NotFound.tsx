@@ -14,7 +14,6 @@ const NotFound = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Navigation */}
       <nav className="border-b border-border/40 sticky top-0 z-50 bg-background/80 backdrop-blur-md">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between min-w-0">
           <Link to="/" className="flex items-center gap-2 min-w-0">
@@ -33,7 +32,6 @@ const NotFound = () => {
         </div>
       </nav>
 
-      {/* 404 Content */}
       <div className="flex items-center justify-center min-h-[calc(100vh-64px)] px-4">
         <div className="text-center max-w-full min-w-0">
           <div className="mb-6 sm:mb-8">

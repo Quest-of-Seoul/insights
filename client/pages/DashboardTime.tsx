@@ -1,6 +1,7 @@
 import DashboardLayout from "@/components/DashboardLayout";
 import { Clock, Users, TrendingUp } from "lucide-react";
 import { useEffect, useState } from "react";
+import { fetchWithAuth } from "@/lib/api";
 
 interface TimeStat {
   time_unit: string;
@@ -17,9 +18,12 @@ export default function DashboardTime() {
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        const response = await fetch(
+        const response = await fetchWithAuth(
           `/api/analytics/location-stats/time?unit=${timeUnit}`
         );
+        if (!response.ok) {
+          throw new Error(`Failed to fetch: ${response.status}`);
+        }
         const data = await response.json();
         setStats(Array.isArray(data) ? data : data.stats || []);
       } catch (error) {
@@ -53,7 +57,6 @@ export default function DashboardTime() {
   return (
     <DashboardLayout>
       <div className="space-y-6 sm:space-y-8 max-w-full">
-        {/* Header */}
         <div className="min-w-0">
           <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-foreground mb-2 break-words">
             시간대별 통계
@@ -63,7 +66,6 @@ export default function DashboardTime() {
           </p>
         </div>
 
-        {/* Time Unit Selector */}
         <div className="flex flex-col sm:flex-row gap-4">
           <div className="flex gap-2 flex-wrap">
             {(["hour", "day", "week"] as const).map((unit) => (
@@ -89,7 +91,6 @@ export default function DashboardTime() {
           </div>
         </div>
 
-        {/* Summary */}
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
           <div className="bg-card border border-border rounded-xl p-4 sm:p-6 min-w-0">
             <div className="flex items-center gap-3 mb-2">
@@ -116,7 +117,6 @@ export default function DashboardTime() {
           </div>
         </div>
 
-        {/* Chart Visualization */}
         <div className="bg-card border border-border rounded-xl p-4 sm:p-6 min-w-0">
           <h2 className="text-base sm:text-lg font-semibold text-foreground mb-4 sm:mb-6 break-words">
             방문 트렌드
@@ -171,7 +171,6 @@ export default function DashboardTime() {
           )}
         </div>
 
-        {/* Table */}
         <div className="bg-card border border-border rounded-xl overflow-hidden">
           <div className="overflow-x-auto -mx-1 sm:mx-0">
             <div className="inline-block min-w-full align-middle">
@@ -257,7 +256,6 @@ export default function DashboardTime() {
           </div>
         </div>
 
-        {/* Info */}
         <div className="bg-secondary/30 border border-border rounded-xl p-4 sm:p-6 min-w-0">
           <h2 className="text-base sm:text-lg font-semibold text-foreground mb-4 break-words">
             통계 설명

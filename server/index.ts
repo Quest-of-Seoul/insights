@@ -12,12 +12,10 @@ import {
 export function createServer() {
   const app = express();
 
-  // Middleware
   app.use(cors());
   app.use(express.json());
   app.use(express.urlencoded({ extended: true }));
 
-  // Example API routes
   app.get("/api/ping", (_req, res) => {
     const ping = process.env.PING_MESSAGE ?? "ping";
     res.json({ message: ping });
@@ -25,7 +23,6 @@ export function createServer() {
 
   app.get("/api/demo", handleDemo);
 
-  // Analytics routes
   app.get("/api/analytics/location-stats/summary", handleLocationStatsSummary);
   app.get("/api/analytics/location-stats/district", handleLocationStatsDistrict);
   app.get("/api/analytics/location-stats/quest", handleLocationStatsQuest);

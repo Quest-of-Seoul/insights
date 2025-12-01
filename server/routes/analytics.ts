@@ -2,9 +2,29 @@ import { RequestHandler } from "express";
 
 const API_BASE_URL = process.env.API_BASE_URL || "http://localhost:8000";
 
-async function fetchFromAPI(endpoint: string) {
+function extractTokenFromRequest(req: Parameters<RequestHandler>[0]): string | undefined {
+  const authHeader = req.headers.authorization;
+  if (authHeader && authHeader.startsWith("Bearer ")) {
+    return authHeader.substring(7);
+  }
+  return undefined;
+}
+
+async function fetchFromAPI(endpoint: string, userToken: string) {
+  if (!userToken) {
+    throw new Error("Authentication token is required");
+  }
+
   try {
-    const response = await fetch(`${API_BASE_URL}${endpoint}`);
+    const headers: Record<string, string> = {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${userToken}`,
+    };
+
+    const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+      headers,
+    });
+
     if (!response.ok) {
       throw new Error(`API request failed: ${response.status}`);
     }
@@ -15,9 +35,13 @@ async function fetchFromAPI(endpoint: string) {
   }
 }
 
-export const handleLocationStatsSummary: RequestHandler = async (_req, res) => {
+export const handleLocationStatsSummary: RequestHandler = async (req, res) => {
   try {
-    const data = await fetchFromAPI("/analytics/location-stats/summary");
+    const userToken = extractTokenFromRequest(req);
+    if (!userToken) {
+      return res.status(401).json({ error: "Authentication token is required" });
+    }
+    const data = await fetchFromAPI("/analytics/location-stats/summary", userToken);
     res.json(data);
   } catch (error) {
     console.error("Error in handleLocationStatsSummary:", error);
@@ -25,9 +49,13 @@ export const handleLocationStatsSummary: RequestHandler = async (_req, res) => {
   }
 };
 
-export const handleLocationStatsDistrict: RequestHandler = async (_req, res) => {
+export const handleLocationStatsDistrict: RequestHandler = async (req, res) => {
   try {
-    const data = await fetchFromAPI("/analytics/location-stats/district");
+    const userToken = extractTokenFromRequest(req);
+    if (!userToken) {
+      return res.status(401).json({ error: "Authentication token is required" });
+    }
+    const data = await fetchFromAPI("/analytics/location-stats/district", userToken);
     res.json(data);
   } catch (error) {
     console.error("Error in handleLocationStatsDistrict:", error);
@@ -35,9 +63,13 @@ export const handleLocationStatsDistrict: RequestHandler = async (_req, res) => 
   }
 };
 
-export const handleLocationStatsQuest: RequestHandler = async (_req, res) => {
+export const handleLocationStatsQuest: RequestHandler = async (req, res) => {
   try {
-    const data = await fetchFromAPI("/analytics/location-stats/quest");
+    const userToken = extractTokenFromRequest(req);
+    if (!userToken) {
+      return res.status(401).json({ error: "Authentication token is required" });
+    }
+    const data = await fetchFromAPI("/analytics/location-stats/quest", userToken);
     res.json(data);
   } catch (error) {
     console.error("Error in handleLocationStatsQuest:", error);
@@ -48,7 +80,11 @@ export const handleLocationStatsQuest: RequestHandler = async (_req, res) => {
 export const handleLocationStatsTime: RequestHandler = async (req, res) => {
   try {
     const unit = (req.query.unit as string) || "day";
-    const data = await fetchFromAPI(`/analytics/location-stats/time?unit=${unit}`);
+    const userToken = extractTokenFromRequest(req);
+    if (!userToken) {
+      return res.status(401).json({ error: "Authentication token is required" });
+    }
+    const data = await fetchFromAPI(`/analytics/location-stats/time?unit=${unit}`, userToken);
     res.json(data);
   } catch (error) {
     console.error("Error in handleLocationStatsTime:", error);

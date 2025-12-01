@@ -1,6 +1,7 @@
 import DashboardLayout from "@/components/DashboardLayout";
 import { Users, Map, MapPin, TrendingUp } from "lucide-react";
 import { useEffect, useState } from "react";
+import { fetchWithAuth } from "@/lib/api";
 
 interface SummaryStats {
   total_visitors: number;
@@ -17,7 +18,10 @@ export default function Dashboard() {
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        const response = await fetch("/api/analytics/location-stats/summary");
+        const response = await fetchWithAuth("/api/analytics/location-stats/summary");
+        if (!response.ok) {
+          throw new Error(`Failed to fetch: ${response.status}`);
+        }
         const data = await response.json();
         setStats(data);
       } catch (error) {
@@ -33,7 +37,6 @@ export default function Dashboard() {
   return (
     <DashboardLayout>
       <div className="space-y-6 sm:space-y-8 max-w-full">
-        {/* Header */}
         <div className="min-w-0">
           <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-foreground mb-2 break-words">
             대시보드
@@ -43,7 +46,6 @@ export default function Dashboard() {
           </p>
         </div>
 
-        {/* Stats Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <StatCard
             icon={Users}
@@ -82,7 +84,7 @@ function StatCard({
   value,
   color,
 }: {
-  icon: any;
+  icon: React.ComponentType<{ className?: string }>;
   label: string;
   value: string | number;
   color: string;

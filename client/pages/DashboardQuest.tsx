@@ -2,6 +2,7 @@ import DashboardLayout from "@/components/DashboardLayout";
 import { MapPin, Users, TrendingUp } from "lucide-react";
 import { useEffect, useState } from "react";
 import { SEOUL_DISTRICTS_KR } from "@shared/constants";
+import { fetchWithAuth } from "@/lib/api";
 
 interface QuestStat {
   quest_id: string;
@@ -19,7 +20,10 @@ export default function DashboardQuest() {
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        const response = await fetch("/api/analytics/location-stats/quest");
+        const response = await fetchWithAuth("/api/analytics/location-stats/quest");
+        if (!response.ok) {
+          throw new Error(`Failed to fetch: ${response.status}`);
+        }
         const data = await response.json();
         setStats(Array.isArray(data) ? data : data.stats || []);
       } catch (error) {
@@ -37,7 +41,6 @@ export default function DashboardQuest() {
     ? stats.filter((s) => s.district === filterDistrict)
     : stats;
 
-  // API에서 받은 자치구와 서울 자치구 목록을 결합하여 정렬
   const apiDistricts = Array.from(new Set(stats.map((s) => s.district)));
   const allDistricts = Array.from(
     new Set([...SEOUL_DISTRICTS_KR, ...apiDistricts])
@@ -62,7 +65,6 @@ export default function DashboardQuest() {
   return (
     <DashboardLayout>
       <div className="space-y-6 sm:space-y-8 max-w-full">
-        {/* Header */}
         <div className="min-w-0">
           <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-foreground mb-2 break-words">
             퀘스트별 통계
@@ -72,7 +74,6 @@ export default function DashboardQuest() {
           </p>
         </div>
 
-        {/* Filters */}
         <div className="flex flex-col sm:flex-row gap-4">
           <div className="flex-1 min-w-0">
             <label className="block text-xs sm:text-sm font-medium text-foreground mb-2 break-words">
@@ -96,7 +97,6 @@ export default function DashboardQuest() {
           </div>
         </div>
 
-        {/* Summary */}
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
           <div className="bg-card border border-border rounded-xl p-4 sm:p-6 min-w-0">
             <div className="flex items-center gap-3 mb-2">
@@ -121,7 +121,6 @@ export default function DashboardQuest() {
           </div>
         </div>
 
-        {/* Table */}
         <div className="bg-card border border-border rounded-xl overflow-hidden">
           <div className="overflow-x-auto -mx-1 sm:mx-0">
             <div className="inline-block min-w-full align-middle">
@@ -206,7 +205,6 @@ export default function DashboardQuest() {
           </div>
         </div>
 
-        {/* Info */}
         <div className="bg-secondary/30 border border-border rounded-xl p-4 sm:p-6 min-w-0">
           <h2 className="text-base sm:text-lg font-semibold text-foreground mb-4 break-words">
             통계 설명

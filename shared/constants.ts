@@ -1,6 +1,3 @@
-/**
- * 서울시 자치구 목록 (한글)
- */
 export const SEOUL_DISTRICTS_KR = [
     "강남구",
     "강동구",
@@ -29,8 +26,5 @@ export const SEOUL_DISTRICTS_KR = [
     "중랑구",
 ] as const;
 
-/**
- * 서울시 자치구 타입
- */
 export type SeoulDistrict = (typeof SEOUL_DISTRICTS_KR)[number];
 
